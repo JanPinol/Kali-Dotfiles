@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-set -eu
+set -euo pipefail
 
 sudo apt update
 
 if [ -f "$HOME/.setup/apt-manual.txt" ]; then
-  pkgs=$(grep -vE '^\s*$' "$HOME/.setup/apt-manual.txt" | tr '\n' ' ')
-  if [ -n "$pkgs" ]; then
-    sudo apt install -y $pkgs
+  mapfile -t pkgs < <(grep -vE '^\s*$|^#' "$HOME/.setup/apt-manual.txt" | sort -u)
+
+  if [ "${#pkgs[@]}" -gt 0 ]; then
+    sudo apt install -y "${pkgs[@]}"
   fi
 fi
